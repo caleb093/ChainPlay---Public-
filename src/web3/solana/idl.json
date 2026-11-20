@@ -1,0 +1,1521 @@
+{
+  "address": "YtcQyJXwTkyYoXXu1MvEPoyW8GhTDWXJNtojtxdbGGn",
+  "metadata": {
+    "name": "chain_play4",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "admin_close_match_account",
+      "docs": [
+        "Admin-only instruction to close a match account and return rent to admin.",
+        "Should only be used on terminal matches (completed/cancelled) or stuck matches."
+      ],
+      "discriminator": [
+        133,
+        186,
+        176,
+        217,
+        26,
+        56,
+        212,
+        185
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true,
+          "address": "7zfU7MoMoTnjND2HcrDPVusDQzL66gD4uMrv7NPoMmMg"
+        },
+        {
+          "name": "match_account",
+          "docs": [
+            "The match account to close — rent returned to player one"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "match_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_one_account",
+          "docs": [
+            "Player one's user PDA — receives escrow refund if match has funds"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "match_account.player_one",
+                "account": "MatchAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_two_account",
+          "docs": [
+            "Player two's user PDA — only needed to clear active_match.",
+            "Optional since match may not have a player two yet."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "match_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "cancel_match",
+      "discriminator": [
+        142,
+        136,
+        247,
+        45,
+        92,
+        112,
+        180,
+        83
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "user_data",
+          "docs": [
+            "Player 1's user PDA — receives the refund.",
+            "Validated in instruction logic against match_account.player_one"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "match_account.player_one",
+                "account": "MatchAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "match_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "match_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "match_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "create_match",
+      "docs": [
+        "Player 1 creates a match and locks their wager into the match escrow PDA.",
+        "match_id is generated client-side (e.g. a UUID) and passed in."
+      ],
+      "discriminator": [
+        107,
+        2,
+        184,
+        145,
+        70,
+        142,
+        17,
+        165
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "user_data"
+          ]
+        },
+        {
+          "name": "user_data",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "match_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "match_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "match_id",
+          "type": "string"
+        },
+        {
+          "name": "wager_amount",
+          "type": "u64"
+        },
+        {
+          "name": "game_mode",
+          "type": "u8"
+        },
+        {
+          "name": "game_id",
+          "type": "string"
+        },
+        {
+          "name": "invited_player",
+          "type": {
+            "option": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "deposit",
+      "discriminator": [
+        242,
+        35,
+        198,
+        137,
+        82,
+        225,
+        242,
+        182
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "user_data"
+          ]
+        },
+        {
+          "name": "user_data",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "usdc_mint",
+          "docs": [
+            "USDC mint — must match the one the vault was initialised with."
+          ]
+        },
+        {
+          "name": "user_usdc",
+          "docs": [
+            "User's USDC token account (source of the deposit)."
+          ],
+          "writable": true
+        },
+        {
+          "name": "vault_token",
+          "docs": [
+            "Program token vault (destination)."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "game_interaction",
+      "discriminator": [
+        45,
+        98,
+        207,
+        209,
+        110,
+  
+          ]
+        },
+        {
+          "name": "user_data",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "match_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "match_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "match_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "refund_maze_match",
+      "docs": [
+        "Admin-only refund for an active maze match.",
+        "Splits the escrow equally between both players; rent from closing the account goes to admin."
+      ],
+      "discriminator": [
+        148,
+        129,
+        137,
+        223,
+        128,
+        35,
+        198,
+        118
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "address": "7zfU7MoMoTnjND2HcrDPVusDQzL66gD4uMrv7NPoMmMg"
+        },
+        {
+          "name": "match_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "match_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_one_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "match_account.player_one",
+                "account": "MatchAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_two_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "match_account.player_two",
+                "account": "MatchAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "Platform vault — retains 0.3% of the pot as revenue"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "match_id",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "settle_match",
+      "docs": [
+        "Called by the backend server after the game ends.",
+        "Receives the full move timeline, simulates the game, confirms the winner, and releases funds.",
+        "",
+        "moves_p1 / moves_p2: array of move values (0=Rock, 1=Paper, 2=Scissors, 255=forfeit/disconnect)"
+      ],
+      "discriminator": [
+        71,
+        124,
+        117,
+        96,
+        191,
+        217,
+        116,
+        24
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "docs": [
+            "Backend server (admin) signs this transaction"
+          ],
+          "writable": true,
+          "signer": true,
+          "address": "7zfU7MoMoTnjND2HcrDPVusDQzL66gD4uMrv7NPoMmMg"
+        },
+        {
+          "name": "match_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "match_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_one_account",
+          "docs": [
+            "Player 1's user PDA — receives payout if they win"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "match_account.player_one",
+                "account": "MatchAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_two_account",
+          "docs": [
+            "Player 2's user PDA — receives payout if they win"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "match_account.player_two",
+                "account": "MatchAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "Platform vault — receives 2.5% of the pot as revenue"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "match_id",
+          "type": "string"
+        },
+        {
+          "name": "moves_p1",
+          "type": "bytes"
+        },
+        {
+          "name": "moves_p2",
+          "type": "bytes"
+        }
+      ]
+    },
+    {
+      "name": "settle_maze_match",
+      "docs": [
+        "Called by the backend server to settle a maze wager match.",
+        "The server determines the winner off-chain and passes the winning pubkey directly.",
+        "No move replay or signature verification — maze move sets are too large for on-chain verification."
+      ],
+      "discriminator": [
+        191,
+        128,
+        232,
+        221,
+        24,
+        170,
+        196,
+        92
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "docs": [
+            "Backend server (admin) signs this transaction"
+          ],
+          "writable": true,
+          "signer": true,
+          "address": "7zfU7MoMoTnjND2HcrDPVusDQzL66gD4uMrv7NPoMmMg"
+        },
+        {
+          "name": "match_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  97,
+                  116,
+                  99,
+                  104
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "match_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_one_account",
+          "docs": [
+            "Player 1's user PDA — receives payout if they win"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "match_account.player_one",
+                "account": "MatchAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_two_account",
+          "docs": [
+            "Player 2's user PDA — receives payout if they win"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "match_account.player_two",
+                "account": "MatchAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "Platform vault — receives 2.5% of the pot as revenue"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "match_id",
+          "type": "string"
+        },
+        {
+          "name": "winner",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "withdraw",
+      "discriminator": [
+        183,
+        18,
+        70,
+        156,
+        148,
+        109,
+        161,
+        34
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "user_data"
+          ]
+        },
+        {
+          "name": "user_data",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "authority"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "user_usdc",
+          "docs": [
+            "User's USDC token account (destination). Created if it doesn't exist yet."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "authority"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "usdc_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "vault_token",
+          "docs": [
+            "Program token vault (source)."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  116,
+                  111,
+                  107,
+                  101,
+                  110
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdraw_from_vault",
+      "discriminator": [
+        180,
+        34,
+        37,
+        46,
+        156,
+        0,
+        211,
+        238
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true,
+          "address": "7zfU7MoMoTnjND2HcrDPVusDQzL66gD4uMrv7NPoMmMg"
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "usdc_mint"
+        },
+        {
+          "name": "admin_usdc",
+          "docs": [
+            "Admin's USDC token account (destination). Created if it doesn't exist yet."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "admin"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "usdc_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+
+      "discriminator": [
+        139,
+        248,
+        167,
+        203,
+        253,
+        220,
+        210,
+        221
+      ]
+    },
+    {
+      "name": "Vault",
+      "discriminator": [
+        211,
+        8,
+        232,
+        43,
+        2,
+        152,
+        117,
+        119
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "EventGameInteraction",
+      "discriminator": [
+        208,
+        90,
+        176,
+        24,
+        115,
+        194,
+        160,
+        128
+      ]
+    },
+    {
+      "name": "MatchCancelled",
+      "discriminator": [
+        99,
+        86,
+        22,
+        122,
+        82,
+        247,
+        60,
+        113
+      ]
+    },
+    {
+      "name": "MatchCreated",
+      "discriminator": [
+        151,
+        176,
+        11,
+        24,
+        34,
+        225,
+        227,
+        16
+      ]
+    },
+    {
+      "name": "MatchReady",
+      "discriminator": [
+        2,
+        60,
+        163,
+        225,
+        124,
+        75,
+        32,
+        232
+      ]
+    },
+    {
+      "name": "MatchRefunded",
+      "discriminator": [
+        185,
+        57,
+        210,
+        244,
+        121,
+        237,
+        113,
+        232
+      ]
+    },
+    {
+      "name": "MatchSettled",
+      "discriminator": [
+        243,
+        201,
+        134,
+        151,
+        193,
+        131,
+        223,
+        150
+      ]
+    },
+    {
+      "name": "WagerLocked",
+      "discriminator": [
+        73,
+        35,
+        162,
+        159,
+        119,
+        61,
+        214,
+        42
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidMatchStatus",
+      "msg": "Match is not in the correct status for this action"
+    },
+    {
+      "code": 6002,
+      "name": "NotAParticipant",
+      "msg": "You are not a participant in this match"
+    },
+    {
+      "code": 6003,
+      "name": "WagerMismatch",
+      "msg": "Wager amount does not match the required amount"
+    },
+    {
+      "code": 6004,
+      "name": "InvalidMove",
+      "msg": "Invalid move — must be 0 (Rock), 1 (Paper), or 2 (Scissors)"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidRoundCount",
+      "msg": "Invalid number of rounds for this game mode"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidMoveSignature",
+      "msg": "Invalid move signature"
+    },
+    {
+      "code": 6007,
+      "name": "Unauthorized",
+      "msg": "Only admin can perform this action"
+    },
+    {
+      "code": 6008,
+      "name": "MatchFull",
+      "msg": "Match already has two players"
+    },
+    {
+      "code": 6009,
+      "name": "CannotJoinOwnMatch",
+      "msg": "Player cannot join their own match"
+    },
+    {
+      "code": 6010,
+      "name": "NotInvited",
+      "msg": "This match is invite-only and you were not invited"
+    },
+    {
+      "code": 6011,
+      "name": "CannotInviteSelf",
+      "msg": "You cannot invite yourself to a match"
+    },
+    {
+      "code": 6012,
+      "name": "PlayerAlreadyInMatch",
+      "msg": "Already in a match"
+    },
+    {
+      "code": 6013,
+      "name": "IncompleteMatch",
+      "msg": "Match is Incomplete"
+    },
+    {
+      "code": 6014,
+      "name": "DisputeMatch",
+      "msg": "Dispute Match"
+    },
+    {
+      "code": 6015,
+      "name": "WrongSettlementInstruction",
+      "msg": "Wrong settlement instruction for this game type"
+    },
+    {
+      "code": 6016,
+      "name": "MissingPlayerTwoAccount",
+      "msg": "Player 2 Account Missing from close match instruction"
+    },
+    {
+      "code": 6017,
+      "name": "InvalidMint",
+      "msg": "Token account mint does not match the vault's configured USDC mint"
+    }
+  ],
+  "types": [
+    {
+      "name": "EventGameInteraction",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "game_id",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MatchAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "match_id",
+            "type": "string"
+          },
+          {
+            "name": "game_id",
+            "type": "string"
+          },
+          {
+            "name": "player_one",
+            "type": "pubkey"
+          },
+          {
+            "name": "player_two",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "invited_player",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "wager_amount",
+            "type": "u64"
+          },
+        "fields": [
+          {
+            "name": "match_id",
+            "type": "string"
+          },
+          {
+            "name": "game_id",
+            "type": "string"
+          },
+          {
+            "name": "player_one",
+            "type": "pubkey"
+          },
+          {
+            "name": "player_two",
+            "type": "pubkey"
+          },
+          {
+            "name": "p1_amount",
+            "type": "u64"
+          },
+          {
+            "name": "p2_amount",
+            "type": "u64"
+          },
+          {
+            "name": "platform_fee",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MatchSettled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "match_id",
+            "type": "string"
+          },
+          {
+            "name": "game_id",
+            "type": "string"
+          },
+          {
+            "name": "winner",
+            "type": "pubkey"
+          },
+          {
+            "name": "payout",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "MatchStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "WaitingForPlayer"
+          },
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "balance",
+            "type": "u64"
+          },
+          {
+            "name": "xp",
+            "type": "u64"
+          },
+          {
+            "name": "active_match",
+            "type": {
+              "option": "string"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vault",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "total_deposits",
+            "type": "u64"
+          },
+          {
+            "name": "revenue",
+            "type": "u64"
+          },
+          {
+            "name": "usdc_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WagerLocked",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "match_id",
+            "type": "string"
+          },
+          {
+            "name": "game_id",
+            "type": "string"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}

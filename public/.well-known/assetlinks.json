@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "games.chainplay.app.twa",
+        "sha256_cert_fingerprints": ["15:50:9B:9B:AA:15:3E:4C:78:C6:69:B9:B6:12:60:15:A9:68:9B:CB:BF:38:BA:1D:24:2D:EF:3C:10:64:D8:E5"]
+      }
+    }]

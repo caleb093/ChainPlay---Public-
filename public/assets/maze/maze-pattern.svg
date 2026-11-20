@@ -1,0 +1,4 @@
+<!-- maze-pattern.svg -->
+<svg width="100%" height="100%" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path stroke="#0ff" stroke-opacity="0.2" stroke-width="1" d="M0 0H200V200H0z M20 20H180V180H20z M40 40H160V160H40z"/>
+</svg>

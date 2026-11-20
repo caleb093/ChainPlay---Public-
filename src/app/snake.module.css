@@ -1,0 +1,27 @@
+.hands {
+  gap: 50px;
+}
+
+.shakeLeft {
+  animation: shake-left 1s ease-in-out;
+}
+
+.shakeRight {
+  animation: shake-right 1s ease-in-out;
+}
+
+@keyframes shake-left {
+  0%, 100% { transform: rotateZ(0deg); }
+  20% { transform: rotateZ(20deg); }
+  40% { transform: rotateZ(-20deg); }
+  60% { transform: rotateZ(20deg); }
+  80% { transform: rotateZ(-20deg); }
+}
+
+@keyframes shake-right {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(20deg); }
+  40% { transform: rotate(-20deg); }
+  60% { transform: rotate(20deg); }
+  80% { transform: rotate(-20deg); }
+}
